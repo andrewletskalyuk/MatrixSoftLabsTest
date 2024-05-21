@@ -1,0 +1,32 @@
+﻿@{
+    ViewData["Title"] = "Team Calendar";
+}
+
+<div id="calendar"></div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.10.1/main.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var calendarEl = document.getElementById('calendar');
+            var calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                events: async function (fetchInfo, successCallback, failureCallback) {
+                    try {
+                        let response = await fetch('/api/holiday/swedish-red-days');
+                        let data = await response.json();
+                        let events = data.map(holiday => ({
+                            title: holiday.name,
+                            start: holiday.date,
+                            allDay: true
+                        }));
+                        successCallback(events);
+                    } catch (error) {
+                        failureCallback(error);
+                    }
+                }
+            });
+            calendar.render();
+        });
+    </script>
+}
